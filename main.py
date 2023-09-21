@@ -15,7 +15,7 @@ mobile_emulation = {
 }
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--window-size=400,400")
-chrome_options.headless = True
+chrome_options.add_argument("--headless=True")
 chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
 
 browser = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
