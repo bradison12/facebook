@@ -7,6 +7,7 @@ import time
 import asyncio
 from send_post import SendPost
 from repost import RepostPost
+from set_frends import SetFriends
 
 mobile_emulation = {
     "deviceMetrics": {"width": 514, "height": 736, "pixelRatio": 3.0},
@@ -14,6 +15,7 @@ mobile_emulation = {
 }
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--window-size=400,400")
+chrome_options.headless = True
 chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
 
 browser = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
@@ -29,10 +31,11 @@ if os.path.isfile(filename):
     browser.refresh()
 else:
     time.sleep(5)
-    search_box = browser.find_element(By.XPATH, '//input[@id="email"]')
+    search_box = browser.find_element(By.XPATH, '//input[@id="m_login_email"]')
     search_box.send_keys('+380632123515')
     del search_box
-    search_box = browser.find_element(By.XPATH, '//input[@id="pass"]')
+    search_box = browser.find_element(
+        By.XPATH, '//input[@id="m_login_password"]')
     search_box.send_keys('Kolyan2010')
     del search_box
     search_box = browser.find_element(By.XPATH, '//*[@name="login"]')
@@ -41,7 +44,8 @@ else:
 while True:
     print(f"1: Send post in Facebook\n")
     print(f"2: Repost in Facebook\n")
-    print(f"3: Exit\n")
+    print(f"3: Get Friends Facebook\n")
+    print(f"0: Exit\n")
     number = int(input('Який номер?'))
     if number == 1:
         rep = SendPost(browser=browser)
@@ -50,13 +54,14 @@ while True:
         rep = RepostPost(browser=browser)
         asyncio.run(rep.start())
     elif number == 3:
+        rep = SetFriends(browser=browser)
+        asyncio.run(rep.send())
+    elif number == 0:
+        print(browser.get_cookies())
+        with open(filename, 'wb') as file:
+            pickle.dump(browser.get_cookies(), file)
         browser.quit()
-    time.sleep(5)
-    if os.path.isfile(filename):
-        os.remove(filename)
-        with open(filename, 'wb') as file:
-            pickle.dump(browser.get_cookies(), file)
-    else:
-        with open(filename, 'wb') as file:
-            pickle.dump(browser.get_cookies(), file)
+        break
+    # with open(filename, 'wb') as file:
+    #     pickle.dump(browser.get_cookies(), file)
     # Закриваємо веб-браузер
